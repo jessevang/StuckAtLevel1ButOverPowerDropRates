@@ -9,6 +9,13 @@ using StardewValley.Locations;
 using Spacechase.Shared.Patching;
 using Netcode;
 using static HarmonyLib.Code;
+using System.Reflection;
+using System.Text.Json.Nodes;
+using System.IO;
+using System.Xml.Linq;
+using Newtonsoft.Json;
+using StardewValley.Network;
+using Newtonsoft.Json.Linq;
 
 /// <summary>Applies Harmony patches to <see cref="GameLocation"/>.</summary>
 
@@ -27,15 +34,71 @@ internal class ObjectPatches : BasePatcher
 
         }
 
-   
 
+    public class RootObject
+    {
+        public string url_short { get; set; }
+        public string url_long { get; set; }
+        public int type { get; set; }
+    }
 
 
     private static void Before_MonsterDrop(GameLocation __instance, Monster monster, int x, int y, Farmer who)
         {
 
-        
+        //Add code for reading config file
+        int NumberOfDrops = 12;
+        int NumberOfDropsWithRing = 24;
+        int counter = 0;
+        // Get the current directory
+        string filePath = Directory.GetCurrentDirectory() + "\\Mods\\StuckAtLevel1ButOverPowerDropRates\\config.json";
 
+        try
+        {
+            
+            // Read the JSON file
+            string jsonString = File.ReadAllText(filePath);
+
+
+            // Deserialize the JSON string into a dynamic object
+            dynamic jsonObj = JsonConvert.DeserializeObject(jsonString);
+
+            // Access the properties of the JSON object
+            foreach (var item in jsonObj)
+            {
+                //Console.WriteLine($"{((JProperty)item).Name}: {((JProperty)item).Value}");
+               
+                if (counter == 0)
+                {
+                    NumberOfDrops = (int)((JProperty)item).Value;
+
+                }
+                if (counter == 1)
+                {
+                    NumberOfDropsWithRing = (int)((JProperty)item).Value;
+                }
+                counter++;
+                
+              
+
+
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            Console.WriteLine($"File '{filePath}' not found.");
+        }
+        catch (JsonException)
+        {
+            Console.WriteLine($"Invalid JSON format in '{filePath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+
+
+        //Updated original code
         NetCollection<Debris> debris = new NetCollection<Debris>();
         IList<String> objects = monster.objectsToDrop;
         Vector2 playerPosition = new Vector2(Game1.player.GetBoundingBox().Center.X, Game1.player.GetBoundingBox().Center.Y);
@@ -43,7 +106,7 @@ internal class ObjectPatches : BasePatcher
         if (who.isWearingRing("526") && DataLoader.Monsters(Game1.content).TryGetValue(monster.Name, out var result))
         {
             // Add this logic to original code to run code to run loot 24 times and adds item to list of items to drop
-            for (int k = 0; k < 24; k++)
+            for (int k = 0; k < NumberOfDropsWithRing; k++)
             {
                 string[] objectsSplit = ArgUtility.SplitBySpace(result.Split('/')[6]);
                 for (int i = 0; i < objectsSplit.Length; i += 2)
@@ -59,7 +122,7 @@ internal class ObjectPatches : BasePatcher
 
         else {
             //Add this logic to original code to run code to run loot 10 times and adds item to list of items to drop
-            for (int j = 0; j < 12; j++)
+            for (int j = 0; j < NumberOfDrops; j++)
             {
                 string result1 = "";
                 Game1.content.Load<Dictionary<string, string>>("Data\\Monsters").TryGetValue(monster.Name, out result1);

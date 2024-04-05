@@ -1,7 +1,7 @@
 ﻿{
   "Name": "StuckAtLevel1ButOverPowerDropRates",
   "Author": "Darkmushu",
-  "Version": "1.0.1",
+  "Version": "1.0.2",
   "Description": "Stuck At Level 1 but have S Class monster drop rates",
   "UniqueID": "Darkmushu.StuckAtLevel1ButOverPowerDropRates",
   "EntryDll": "StuckAtLevel1ButOverPowerDropRates.dll",
