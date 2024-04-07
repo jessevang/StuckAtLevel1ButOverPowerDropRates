@@ -23,16 +23,24 @@ using Newtonsoft.Json.Linq;
 internal class ObjectPatches : BasePatcher
     {
 
-        public override void Apply(Harmony harmony, IMonitor monitor)
+    public override void Apply(Harmony harmony, IMonitor monitor)
         {
 
+        //leverages harmony patch to run my code instead of original code during game runtime below 
             harmony.Patch(
                 original: this.RequireMethod<GameLocation>(nameof(GameLocation.monsterDrop)),
                 prefix: this.GetHarmonyMethod(nameof(Before_MonsterDrop))
 
             );
+        /*/use to update days play from 1 to 5 so mining is opened up
+        harmony.Patch(
+            original: this.RequireMethod<GameLocation>(nameof(Mountain.DayUpdate)),
+            prefix: this.GetHarmonyMethod(nameof(After_resetSharedState))
 
-        }
+        );
+        */
+
+    }
 
 
     public class RootObject
@@ -98,7 +106,9 @@ internal class ObjectPatches : BasePatcher
         }
 
 
-        //Updated original code
+
+
+        //Updated original code to
         NetCollection<Debris> debris = new NetCollection<Debris>();
         IList<String> objects = monster.objectsToDrop;
         Vector2 playerPosition = new Vector2(Game1.player.GetBoundingBox().Center.X, Game1.player.GetBoundingBox().Center.Y);
@@ -165,8 +175,17 @@ internal class ObjectPatches : BasePatcher
 
     }
 
-
-
+    /*
+    private static void After_resetSharedState()
+    {
+        if (Game1.stats.DaysPlayed <= 0)
+        {
+            Game1.stats.DaysPlayed = 5;
+        }
+        return;
     }
+    */
+
+}
 
 
