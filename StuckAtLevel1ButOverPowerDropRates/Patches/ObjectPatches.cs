@@ -23,6 +23,7 @@ using Newtonsoft.Json.Linq;
 internal class ObjectPatches : BasePatcher
     {
 
+
     public override void Apply(Harmony harmony, IMonitor monitor)
         {
 
@@ -32,13 +33,6 @@ internal class ObjectPatches : BasePatcher
                 prefix: this.GetHarmonyMethod(nameof(Before_MonsterDrop))
 
             );
-        /*/use to update days play from 1 to 5 so mining is opened up
-        harmony.Patch(
-            original: this.RequireMethod<GameLocation>(nameof(Mountain.DayUpdate)),
-            prefix: this.GetHarmonyMethod(nameof(After_resetSharedState))
-
-        );
-        */
 
     }
 
@@ -53,20 +47,18 @@ internal class ObjectPatches : BasePatcher
 
     private static void Before_MonsterDrop(GameLocation __instance, Monster monster, int x, int y, Farmer who)
         {
-
+         Boolean TurnOn_MoreMonsterDrops = false;
         //Add code for reading config file
         int NumberOfDrops = 12;
         int NumberOfDropsWithRing = 24;
-        int counter = 0;
         // Get the current directory
         string filePath = Directory.GetCurrentDirectory() + "\\Mods\\StuckAtLevel1ButOverPowerDropRates\\config.json";
 
         try
         {
-            
+
             // Read the JSON file
             string jsonString = File.ReadAllText(filePath);
-
 
             // Deserialize the JSON string into a dynamic object
             dynamic jsonObj = JsonConvert.DeserializeObject(jsonString);
@@ -74,21 +66,34 @@ internal class ObjectPatches : BasePatcher
             // Access the properties of the JSON object
             foreach (var item in jsonObj)
             {
-                //Console.WriteLine($"{((JProperty)item).Name}: {((JProperty)item).Value}");
-               
-                if (counter == 0)
+                Console.WriteLine($"{((JProperty)item).Name}: {((JProperty)item).Value}");
+
+                string propertyName = ((JProperty)item).Name.ToString();
+                if (propertyName == "NumberOfDrops")
                 {
                     NumberOfDrops = (int)((JProperty)item).Value;
+                    Console.WriteLine("NumberOfDrops has been set to :" + NumberOfDrops);
 
                 }
-                if (counter == 1)
+                else if (propertyName == "NumberOfDropsWithRing")
                 {
                     NumberOfDropsWithRing = (int)((JProperty)item).Value;
+                    Console.WriteLine("NumberOfDropsWithRing has been set to :" + NumberOfDropsWithRing);
                 }
-                counter++;
-                
-              
 
+                else if (propertyName == "TurnOnMoreMonsterDrops")
+                {
+                    if ((uint)((JProperty)item).Value == 1)
+                    {
+                        TurnOn_MoreMonsterDrops = true;
+                        Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + true);
+                    }
+                    else if ((uint)((JProperty)item).Value == 0)
+                    {
+                        TurnOn_MoreMonsterDrops = false;
+                        Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + false);
+                    }
+                }
 
             }
         }
@@ -106,8 +111,13 @@ internal class ObjectPatches : BasePatcher
         }
 
 
-
-
+      
+        //if more monster drop is turned off the drops will set back to 1 and 2 items.
+        if (TurnOn_MoreMonsterDrops == false)
+        {
+            NumberOfDrops = 1;
+            NumberOfDropsWithRing = 2;
+        }
         //Updated original code to
         NetCollection<Debris> debris = new NetCollection<Debris>();
         IList<String> objects = monster.objectsToDrop;
@@ -131,7 +141,7 @@ internal class ObjectPatches : BasePatcher
 
 
         else {
-            //Add this logic to original code to run code to run loot 10 times and adds item to list of items to drop
+            //Add this logic to original code to run code to run loot x times and adds item to list of items to drop
             for (int j = 0; j < NumberOfDrops; j++)
             {
                 string result1 = "";
@@ -175,16 +185,7 @@ internal class ObjectPatches : BasePatcher
 
     }
 
-    /*
-    private static void After_resetSharedState()
-    {
-        if (Game1.stats.DaysPlayed <= 0)
-        {
-            Game1.stats.DaysPlayed = 5;
-        }
-        return;
-    }
-    */
+
 
 }
 
