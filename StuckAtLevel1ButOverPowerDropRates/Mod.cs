@@ -26,6 +26,17 @@ namespace StuckAtLevel1ButOverPowerDropRates
         public Boolean TurnOn_MoreMonsterDrops = false;  //Will be handled in object patches .cs file as if added here the code will no longer trigger
         public uint NumberOfDrops;
         public uint NumberOfDropsWithRing;
+        public const string ConfigFileName = "config.json";
+
+        private class Config
+        {
+            public int TurnOnEarlyMining { get; set; } = 1; // Default value
+            public int TurnOnMoreMonsterDrops { get; set; } = 1; // Default value
+            public int withoutBurglarRing { get; set; } = 12; // Default value
+            public int withBurglarRing { get; set; } = 24; // Default value
+
+        }
+
         /*********
        ** Public methods
        *********/
@@ -33,20 +44,23 @@ namespace StuckAtLevel1ButOverPowerDropRates
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper)
         {
+            var config = helper.ReadConfig<Config>() ?? new Config();
+
             helper.Events.GameLoop.GameLaunched += onGameLaunch; //loads config file on game launch
             helper.Events.GameLoop.DayStarted += onStartOfDay;
             helper.Events.GameLoop.DayEnding += onEndOfDay;
 
-
+            
+       
             //This Harmony Patcher turns on more monster drops
             HarmonyPatcher.Apply(this,
             new ObjectPatches() 
             );
 
-
-
-
         }
+
+
+
 
 
         //reads config file and sets and turns on certain mod features
