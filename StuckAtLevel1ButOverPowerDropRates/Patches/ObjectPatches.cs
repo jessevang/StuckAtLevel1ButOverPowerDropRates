@@ -66,19 +66,19 @@ internal class ObjectPatches : BasePatcher
             // Access the properties of the JSON object
             foreach (var item in jsonObj)
             {
-                Console.WriteLine($"{((JProperty)item).Name}: {((JProperty)item).Value}");
+                //Console.WriteLine($"{((JProperty)item).Name}: {((JProperty)item).Value}");
 
                 string propertyName = ((JProperty)item).Name.ToString();
                 if (propertyName == "NumberOfDrops")
                 {
                     NumberOfDrops = (int)((JProperty)item).Value;
-                    Console.WriteLine("NumberOfDrops has been set to :" + NumberOfDrops);
+                    //Console.WriteLine("NumberOfDrops has been set to :" + NumberOfDrops);
 
                 }
                 else if (propertyName == "NumberOfDropsWithRing")
                 {
                     NumberOfDropsWithRing = (int)((JProperty)item).Value;
-                    Console.WriteLine("NumberOfDropsWithRing has been set to :" + NumberOfDropsWithRing);
+                    //Console.WriteLine("NumberOfDropsWithRing has been set to :" + NumberOfDropsWithRing);
                 }
 
                 else if (propertyName == "TurnOnMoreMonsterDrops")
@@ -86,12 +86,12 @@ internal class ObjectPatches : BasePatcher
                     if ((uint)((JProperty)item).Value == 1)
                     {
                         TurnOn_MoreMonsterDrops = true;
-                        Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + true);
+                      //  Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + true);
                     }
                     else if ((uint)((JProperty)item).Value == 0)
                     {
                         TurnOn_MoreMonsterDrops = false;
-                        Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + false);
+                     //   Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + false);
                     }
                 }
 

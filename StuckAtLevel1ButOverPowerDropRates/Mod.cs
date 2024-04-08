@@ -67,31 +67,31 @@ namespace StuckAtLevel1ButOverPowerDropRates
                 // Access the properties of the JSON object
                 foreach (var item in jsonObj)
                 {
-                    Console.WriteLine($"{((JProperty)item).Name}: {((JProperty)item).Value}");
+                    //Console.WriteLine($"{((JProperty)item).Name}: {((JProperty)item).Value}");
 
                     string propertyName = ((JProperty)item).Name.ToString();
                     if (propertyName == "NumberOfDrops")
                     {
                         NumberOfDrops = (uint)((JProperty)item).Value;
-                        Console.WriteLine("NumberOfDrops has been set to :" + NumberOfDrops);
+                        //Console.WriteLine("NumberOfDrops has been set to :" + NumberOfDrops);
 
                     }
                     else if (propertyName == "NumberOfDropsWithRing")
                     {
                         NumberOfDropsWithRing = (uint)((JProperty)item).Value;
-                        Console.WriteLine("NumberOfDropsWithRing has been set to :" + NumberOfDropsWithRing);
+                        //Console.WriteLine("NumberOfDropsWithRing has been set to :" + NumberOfDropsWithRing);
                     }
                     else if (propertyName == "TurnOnEarlyMining")
                     {
                         if ((uint)((JProperty)item).Value == 1)
                         {
                             TurnOn_EarlyingMining = true;
-                            Console.WriteLine("TurnOnEarlyMining has been set to :" + true);
+                            //Console.WriteLine("TurnOnEarlyMining has been set to :" + true);
                         }
                         else if ((uint)((JProperty)item).Value == 0)
                         {
                             TurnOn_EarlyingMining = false;
-                            Console.WriteLine("TurnOnEarlyMining has been set to :" + false);
+                            //Console.WriteLine("TurnOnEarlyMining has been set to :" + false);
                         }
 
                             
@@ -101,12 +101,12 @@ namespace StuckAtLevel1ButOverPowerDropRates
                         if ((uint)((JProperty)item).Value == 1)
                         {
                             TurnOn_MoreMonsterDrops = true;
-                            Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + true);
+                            //Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + true);
                         }
                         else if ((uint)((JProperty)item).Value == 0)
                         {
                             TurnOn_MoreMonsterDrops = false;
-                            Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + false);
+                            //Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + false);
                         }
                     }
 
@@ -135,13 +135,13 @@ namespace StuckAtLevel1ButOverPowerDropRates
             if (!TurnOn_EarlyingMining)
                 return;
 
-            Console.WriteLine("CurrentDaysPlayed : " + Game1.stats.DaysPlayed);
+            //Console.WriteLine("CurrentDaysPlayed : " + Game1.stats.DaysPlayed);
             this.realCurrentDay = (uint)Game1.stats.DaysPlayed;
             // Check the number of days played
             if (Game1.stats.DaysPlayed <= 5)
                 {
                     Game1.stats.DaysPlayed = 5; // Set the days played to 5
-                    Console.WriteLine("Days played set :" + Game1.stats.DaysPlayed);
+                    //Console.WriteLine("Days played set :" + Game1.stats.DaysPlayed);
                 }
 
         }
@@ -151,9 +151,9 @@ namespace StuckAtLevel1ButOverPowerDropRates
         {
             if (!TurnOn_EarlyingMining)
                 return;
-            Console.WriteLine("CurrentDaysPlayed : " + Game1.stats.DaysPlayed);
+           // Console.WriteLine("CurrentDaysPlayed : " + Game1.stats.DaysPlayed);
             Game1.stats.DaysPlayed = this.realCurrentDay;
-            Console.WriteLine("Current Day has been set to : " + Game1.stats.DaysPlayed);
+            //Console.WriteLine("Current Day has been set to : " + Game1.stats.DaysPlayed);
 
         }
 
