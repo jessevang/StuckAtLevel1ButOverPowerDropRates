@@ -26,13 +26,14 @@ internal class ObjectPatches : BasePatcher
 
     public override void Apply(Harmony harmony, IMonitor monitor)
         {
-
+        
         //leverages harmony patch to run my code instead of original code during game runtime below 
             harmony.Patch(
                 original: this.RequireMethod<GameLocation>(nameof(GameLocation.monsterDrop)),
                 prefix: this.GetHarmonyMethod(nameof(Before_MonsterDrop))
 
             );
+        
 
     }
 
@@ -47,8 +48,6 @@ internal class ObjectPatches : BasePatcher
 
     private static void Before_MonsterDrop(GameLocation __instance, Monster monster, int x, int y, Farmer who)
         {
-         Boolean TurnOn_MoreMonsterDrops = false;
-        //Add code for reading config file
         int NumberOfDrops = 12;
         int NumberOfDropsWithRing = 24;
         // Get the current directory
@@ -56,7 +55,6 @@ internal class ObjectPatches : BasePatcher
 
         try
         {
-
             // Read the JSON file
             string jsonString = File.ReadAllText(filePath);
 
@@ -67,33 +65,19 @@ internal class ObjectPatches : BasePatcher
             foreach (var item in jsonObj)
             {
                 //Console.WriteLine($"{((JProperty)item).Name}: {((JProperty)item).Value}");
-
                 string propertyName = ((JProperty)item).Name.ToString();
-                if (propertyName == "NumberOfDrops")
+                if (propertyName == "withoutBurglarRing")
                 {
                     NumberOfDrops = (int)((JProperty)item).Value;
-                    //Console.WriteLine("NumberOfDrops has been set to :" + NumberOfDrops);
+                   // Console.WriteLine("withoutBurglarRing has been set to :" + NumberOfDrops);
 
                 }
-                else if (propertyName == "NumberOfDropsWithRing")
+                else if (propertyName == "withBurglarRing")
                 {
                     NumberOfDropsWithRing = (int)((JProperty)item).Value;
-                    //Console.WriteLine("NumberOfDropsWithRing has been set to :" + NumberOfDropsWithRing);
+                    //Console.WriteLine("withBurglarRing has been set to :" + NumberOfDropsWithRing);
                 }
 
-                else if (propertyName == "TurnOnMoreMonsterDrops")
-                {
-                    if ((uint)((JProperty)item).Value == 1)
-                    {
-                        TurnOn_MoreMonsterDrops = true;
-                      //  Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + true);
-                    }
-                    else if ((uint)((JProperty)item).Value == 0)
-                    {
-                        TurnOn_MoreMonsterDrops = false;
-                     //   Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + false);
-                    }
-                }
 
             }
         }
@@ -112,12 +96,7 @@ internal class ObjectPatches : BasePatcher
 
 
       
-        //if more monster drop is turned off the drops will set back to 1 and 2 items.
-        if (TurnOn_MoreMonsterDrops == false)
-        {
-            NumberOfDrops = 1;
-            NumberOfDropsWithRing = 2;
-        }
+
         //Updated original code to
         NetCollection<Debris> debris = new NetCollection<Debris>();
         IList<String> objects = monster.objectsToDrop;
@@ -134,37 +113,38 @@ internal class ObjectPatches : BasePatcher
                     if (Game1.random.NextDouble() < Convert.ToDouble(objectsSplit[i + 1]))
                     {
                         objects.Add(objectsSplit[i]);
+                       // Console.WriteLine("1 item has been added for NumberOfDropsWithRing");
                     }
                 }
             }
         }
 
 
-        else {
-            //Add this logic to original code to run code to run loot x times and adds item to list of items to drop
-            for (int j = 0; j < NumberOfDrops; j++)
+        else if (!who.isWearingRing("526") && DataLoader.Monsters(Game1.content).TryGetValue(monster.Name, out var result2))
+        {
+            // Add this logic to original code to run code to run loot 12 times and adds item to list of items to drop
+            for (int k = 0; k < NumberOfDrops; k++)
             {
-                string result1 = "";
-                Game1.content.Load<Dictionary<string, string>>("Data\\Monsters").TryGetValue(monster.Name, out result1);
-                if (result1 != null && result1.Length > 0)
+                string[] objectsSplit = ArgUtility.SplitBySpace(result2.Split('/')[6]);
+                for (int i = 0; i < objectsSplit.Length; i += 2)
                 {
-                    string[] objectsSplit = result1.Split('/')[6].Split(' ');
-                    for (int l = 0; l < objectsSplit.Length; l += 2)
+                    if (Game1.random.NextDouble() < Convert.ToDouble(objectsSplit[i + 1]))
                     {
-                        if (Game1.random.NextDouble() < Convert.ToDouble(objectsSplit[l + 1]))
-                        {
-                            objects.Add(objectsSplit[l]);
-
-
-                        }
+                        objects.Add(objectsSplit[i]);
+                       // Console.WriteLine("1 item has been added for NumberOfDropsWithRing");
                     }
                 }
             }
+         
+
+
+
         }
 
 
         // code creates the items and drops onto screen.
         List<Debris> debrisToAdd = new List<Debris>();
+        //Console.WriteLine("TurnOnMoreMonsterDrops has been set to :" + true);
         for (int i = 0; i < objects.Count; i++)
         {
             string objectToAdd = objects[i];
@@ -181,7 +161,7 @@ internal class ObjectPatches : BasePatcher
 
         return;
 
-
+        
 
     }
 
